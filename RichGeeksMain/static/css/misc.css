@@ -1,0 +1,19 @@
+body {
+  padding-top: 100px;
+  padding-bottom: 40px;
+}
+
+.cover-heading a {
+  font-family: 'Lobster Two',"Kaushan Script","Helvetica Neue",Helvetica,Arial,cursive;
+  font-size: 72px;
+  color: #fed136;
+}
+
+.content {
+	margin-top: 50px;
+}
+
+.btn {
+	font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 700;
+}

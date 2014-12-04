@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Rich Geeks{% endblock %}
+
+{% block css %}
+<link href="/static/css/message.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="col-md-10">
+            <h1>Message</h1>
+			{% for message in messages %}
+				{% if message.message_type == "Apply Project" %}
+					{% include 'message/message_apply_project.html' with message=message %}
+				{% endif %}
+				{% if message.message_type == "Assigned Project" %}
+					{% include 'message/message_assigned_project.html' with message=message %}
+				{% endif %}
+			{% endfor %}
+        </div>
+    </div>
+{% endblock %}

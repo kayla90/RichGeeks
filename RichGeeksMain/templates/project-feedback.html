@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Rich Geeks{% endblock %}
+
+{% block css %}
+<link href="/static/css/project-apply.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+     <div class="container">
+        <div class="col-md-10">
+            <h1>Giving Feedback</h1>
+            <form role="form" action="/project/feedback/1" method="POST">
+                <div class="form-group">
+                    <label for="feedback-rating">Rating(from 1 to 5)</label>
+                    <input type="number" class="form-control" id="feedback-rating" name="feedback_rating" placeholder="Enter your rating">
+                </div>
+               <div class="form-group">
+                    <label for="feedback-text">Feedback</label>
+                    <textarea type="text" class="form-control" id="feedback-text" name="feedback_text" placeholder="What do you want to say about the project?"></textarea>
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

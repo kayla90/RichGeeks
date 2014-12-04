@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Rich Geeks{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+      <div class="container">
+        <div class="col-md-3" id="statuses">
+            <div class="list-group">
+                <a href="#" class="list-group-item">Projects</a>
+                <a href="#" class="list-group-item">Geeks</a>
+                <a href="#" class="list-group-item">Posts</a>
+            </div>
+            <div class="list-group">
+                <a href="#" class="list-group-item">All Categories</a>
+                <a href="#" class="list-group-item">Web Application</a>
+                <a href="#" class="list-group-item">Mobile Application</a>
+                <a href="#" class="list-group-item">Design</a>
+            </div>
+            <div class="list-group">
+                <a href="#" class="list-group-item">All Rewards</a>
+                <a href="#" class="list-group-item">&lt500</a>
+                <a href="#" class="list-group-item">500 - 1000</a>
+            </div>
+            <div class="list-group">
+                <a href="#" class="list-group-item">All Ratings</a>
+                <a href="#" class="list-group-item">
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                </a>
+                <a href="#" class="list-group-item">
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="jumbotron">
+                <h1>{{projects|length}} Results</h1>
+            </div>
+            {% for project in projects %}
+  	          {% include 'project-overview.html' with project=project %}
+  	        {% endfor %}            
+        </div>
+      </div>
+{% endblock %}

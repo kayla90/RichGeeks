@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Rich Geeks - {{project.title}}</title>
+
+    <!-- Bootstrap Core CSS -->
+   <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/static/css/project-detail.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="static/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Lobster+Two' rel='stylesheet' type='text/css'>
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+    <div class="navbar-wrapper">
+        <div class="container">
+
+            <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+              <div class="container">
+                <div class="navbar-header">
+                  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
+                  <a class="navbar-brand" href="{% url 'home' %}">
+                    Rich Geeks
+                  </a>
+                </div>
+                <div class="navbar-collapse collapse">
+                  <ul class="nav navbar-nav">
+                    <li class="home-nav-btn">
+                      <a href="{% url 'home' %}">
+                        <span class="glyphicon glyphicon-home">
+                        </span>
+                        Geek's Bridge
+                      </a>
+                    </li>
+                    <li class="market-nav-btn">
+                      <a href="/market">
+                        <span class="glyphicon glyphicon-screenshot">
+                        </span>
+                        Geek's Market
+                      </a>
+                    </li>
+                    <li class="message-nav-btn">
+                      <a href="/message">
+                        <span class="glyphicon glyphicon-envelope">
+                        </span>
+                        Message
+                      </a>
+                    </li>
+                    <li class="me-nav-btn">
+                      <a href="{% url 'profile' user.id %}">
+                        <span class="glyphicon glyphicon-user">
+                        </span>
+                        Me
+                      </a>
+                    </li>
+                  </ul>
+
+                  <ul class="nav navbar-nav navbar-right">
+                    <li>
+                      <form class="navbar-form navbar-right search" role="search">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Find projects">
+                        </div>
+                        <button type="submit" class="btn btn-default btn-circle">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                      </form>
+                    </li>
+                    <li>
+                      <a href="#" data-toggle="modal" data-target="#loginModal">
+                        Hello, {{ user.username }}
+                      </a>
+                    </li>
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-cog">
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{% url 'profile' user.id %}">My Profile</a></li>
+                                <li><a href="">Edit Profile</a></li>
+                                <li><a href="{% url 'logout' %}">Log Out</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">About</a></li>
+                            </ul>
+                        </span>
+                      </a>
+                    </li>              
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('../static/img/home-bg.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h1>{{project.title}}</h1>
+                        <hr class="small">
+                        <!-- <span class="subheading">A Clean Blog Theme by Start Bootstrap</span> -->
+                        {% if button %}
+                        <span>
+                            <a class="btn btn-danger btn-lg" href="/project/cancel/{{project.id}}" role="button">Cancel Project</a>
+                        </span>
+                        	{% if project.status == "Working" %}
+            					<span>
+            						<a class="btn btn-success btn-lg" href="/project/finish/{{project.id}}" role="button">Project Complete</a>
+            					</span>
+            				{% endif %}
+                        {% else %}
+                        <span>
+                            <a class="btn btn-success btn-lg" href="/project/apply/{{project.id}}" role="button">Apply Project</a>
+                        </span>
+                        <span>
+                            <a class="btn btn-success btn-lg" href="/project/feedback/{{project.id}}" role="button">FeedBack</a>
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-preview">
+                    <a>
+                        <h2 class="post-title">
+                            {{project.title}}
+                        </h2>
+                    </a>
+                        <h3 class="post-subtitle">
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                        </h3>
+
+                    <p class="post-meta">Posted by <a href="#">{{project.owner.user.username}}</a> on {{project.date_create}}</p>
+                <p>{{project.description}}</p>
+                <p><b>Label: </b>Django, Python, PostgreSql<br></p>
+                <p><b>Owner: </b></p>
+                <div class="row">
+                    <div class="col-md-2">
+                        <img src="{% url 'avatar' project.owner.user.id %}" alt="avatar" class="img-circle">
+                    </div>
+                </div>
+                <p><b>Participants: </b></p>
+                <div class="row">
+                    {% if project.assignee %}
+                    <div class="col-md-2">
+                        <img src="{% url 'avatar' project.assignee.user.id %}" alt="avatar" class="img-circle">
+                    </div>
+                    {% endif %}
+                </div>
+                </div>
+                
+
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="#">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; Rich Geeks 2014</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="/static/js/classie.js"></script>
+    <script src="/static/js/cbpAnimatedHeader.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="/static/js/jqBootstrapValidation.js"></script>
+
+</body>
+
+</html>

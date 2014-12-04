@@ -1,0 +1,30 @@
+			<div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-2">
+                        <img class="media-object" id="user-face" src="/avatar/{{message.sender.user.id}}" alt="Profile Image" height="75" width="75">
+                    	<p style="margin-top:10px">{{message.date|date:"d M Y"}}</p>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <h4>
+                            	<span>
+                                	<a><b>{{message.sender.user.username}}</b></a>
+                            	</span>
+                            	<span>send you an application on project</span>
+                            	<span>
+                                	<a href="/project/{{message.project.id}}"><b>{{message.project.title}}</b></a>
+                            	</span>
+                            </h4>
+                            <p style="margin-top:10px">{{message.project_application.description_experience}}</p>
+                			<p>
+                				<b>Expected Time: </b>{{message.project_application.expected_time}}            
+                				<b style="margin-left:5em">Expected Earning: </b>{{message.project_application.expected_earning}}<br>
+                			</p>
+                        </div>
+                        <div class="row" id="accAndregButton">
+                        	<a class="btn btn-success " href="/project/assign/{{message.project.id}}/{{message.sender.user.id}}" role="button">Accept</a>
+                            <a class="btn btn-danger " href="/message/delete/{{message.id}}" role="button">Delete</a>       
+                        </div>
+                    </div>
+                </div>
+            </div>

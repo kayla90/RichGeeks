@@ -1,0 +1,14 @@
+            <div class="col-md-12">
+                <a href="project/{{project.id}}"><h2>{{project.title}}</h2></a>
+                <p>
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                    <span class="glyphicon glyphicon-star"></span>
+                    posted by <a href="/profile/{{project.owner.user.id}}">{{project.owner.user.username}}</a> on {{project.date_create}}
+                </p>
+                <p>{{project.description}}</p>
+                <p><b>Languages: </b>{% for language in project.languages.all %}{{language.language}}, {% endfor %}<br>
+                <b>Reward: </b>{{project.budget}}</p>
+            </div>

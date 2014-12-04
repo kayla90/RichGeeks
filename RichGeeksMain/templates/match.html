@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Rich Geeks - {{ profile_user.username }}{% endblock %}
+{% block content %}
+
+    
+    
+<link href="/static/css/match.css" rel="stylesheet">
+</head>
+    <body class="collection " id="page-collection">
+        <div id="root">            
+            
+<article id="content" >
+<h1 id="category-Handmade-leather-bags">Matches for teammates and projects</h1>
+<div class="col-a"></div>
+<ul class="gallery-b">
+
+    {% for teammate in teammates %}
+     <li><a href="/profile/{{teammate.githuber.user.id}}"><img src="{% url 'avatar' teammate.githuber.user.id %}" width="230" height="230">
+            <span>{{teammate.githuber.user.username}}<br>{{teammate.language}}  </span>
+      </a>
+    {% endfor %}
+    {% for project in projects %}
+     <li><a href="/project/{{project.id}}"><img src="/static/img/icon.png" width="230" height="230">
+            <span>{{project.title}}<br>${{project.budget}}  </span>
+      </a>
+    {% endfor %}
+</ul>
+<iframe src='http://pixel.fetchback.com/serve/fb/pdj?cat=&name=landing&sid=6659'
+scrolling='no' width='1' height='1' marginheight='0' marginwidth='0'
+frameborder='0'></iframe>
+            </article>
+        </div>
+
+</body>
+</html>
+{% endblock %}

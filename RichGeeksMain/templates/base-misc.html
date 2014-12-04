@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="The home page of Rich Geeks">
+    <meta name="author" content="Yichen Wang">
+    <link rel="icon" href="/static/img/favicon.ico">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/static/css/misc.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Lobster+Two' rel='stylesheet' type='text/css'>
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+
+    <!-- Google Fonts embed code -->
+
+
+  </head>
+
+  <body>
+    <div class="container">
+        <div class="col-md-12 welcome">
+            <h1 class="cover-heading">
+                <a href="{% url 'home' %}" style="text-decoration:none;">
+                Rich Geeks
+                </a>
+            </h1>
+        </div>
+        <div class="col-md-2">
+        </div>
+        <div class="jumbotron content col-md-8">
+            {% block content %}{% endblock %}
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
