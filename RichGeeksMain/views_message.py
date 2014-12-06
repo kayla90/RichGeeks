@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -55,10 +55,15 @@ def reply_message(request):
 
 @login_required
 def delete_message(request, message_id):
-	if not Message.objects.filter(id=message_id):
-		return HttpResponseNotFound()
-
-	message = Message.objects.get(id=message_id)
+	
+	message = get_object_or_404(Message, id=message_id)
 	message.is_active=False
 	message.save()
 	return redirect('/message')
+
+
+@login_required
+def message_number(request):
+	new_message = len(Message.objects.filter(receiver__user=request.user,\
+		is_active=True))
+	return HttpResponse(new_message, content_type="text/plain")

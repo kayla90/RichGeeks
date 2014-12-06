@@ -13,10 +13,19 @@
 				{% if message.message_type == "Apply Project" %}
 					{% include 'message/message_apply_project.html' with message=message %}
 				{% endif %}
+				{% if message.message_type == "Friend Request" %}
+					{% include 'message/message_friend_request.html' with message=message %}
+				{% endif %}
 				{% if message.message_type == "Assigned Project" %}
 					{% include 'message/message_assigned_project.html' with message=message %}
 				{% endif %}
 			{% endfor %}
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+$(".message-nav-btn").addClass("active");
+</script>
 {% endblock %}

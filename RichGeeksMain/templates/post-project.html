@@ -149,6 +149,13 @@
                         </div>
                         <div class="panel-body">
                             <div class="row">
+                            {% for key, error in form.errors.items %}
+           					 <div class="alert alert-warning" role="alert">
+                				<p style="color: red">
+                    			{{ error.as_text|cut:"* " }}
+                				</p>
+            					</div>
+            				{% endfor %}
                                 <form role="form" action="/project/post" method="POST">
                                     <div class="col-lg-6">
                                         <input type="hidden" id="title" name="title" value="">
@@ -162,17 +169,18 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Project Category</label>
-                                            <select class="form-control">
-                                                <option selected>--</option>
-                                                <option>Web Programming</option>
-                                                <option>Data Analysis</option>
-                                                <option>Database Development</option>
-                                                <option>Mobile Application</option>
-                                                <option>Software Application</option>
-                                                <option>System Administration</option>
-                                                <option>Testing &amp; QA</option>
-                                                <option>Website Design</option>
+                                            <select class="form-control" name="category">
+                                                <option selected value="">--</option>
+                                                <option value="Web Programming">Web Programming</option>
+                                                <option value="Data Analysis">Data Analysis</option>
+                                                <option value="Database Development">Database Development</option>
+                                                <option value="Mobile Application">Mobile Application</option>
+                                                <option value="Software Application">Software Application</option>
+                                                <option value="System Administration">System Administration</option>
+                                                <option value="Testing QA">Testing &amp; QA</option>
+                                                <option value="Website Design">Website Design</option>
                                             </select>
+
                                         </div>
                                     </div>
                                     <div class="col-lg-6">

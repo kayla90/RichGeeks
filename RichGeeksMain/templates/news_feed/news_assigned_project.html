@@ -7,7 +7,7 @@
 						<a href="{% url 'profile' news_feed.user_profile.user.id %}">{{news_feed.user_profile.user.username}}</a>
 						has been assigned on project:
 					</h4>
-					<div class="media">
+					<div class="media project">
 						<div class="media-body">
 							<a href="/project/{{news_feed.project.id}}"><h4 class="media-heading">{{news_feed.project.title}}</h4></a>
 							<p>{{news_feed.project.description}}</p>

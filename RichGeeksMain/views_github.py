@@ -1,30 +1,47 @@
 __author__ = 'renshiming'
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from github import Github
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 import json
 import requests
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from RichGeeksMain.models import *
+
 ACCESS_TOKEN = '8e87a4670383b27a163b8a020955b4761a6da3dc'
 # Create your views here.
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 def home(request):
     return render(request, 'index.html')
 
-def sex(request, username):
+@csrf_exempt
+@login_required
+def sex(request, id):
+    #render("404.html")
     context = {}
-    context['username'] = username
+    profile = get_object_or_404(UserProfile, user=id)
+    if not profile.github_login:
+        raise Http404
+
+    context['username'] = profile.github_login
     return render(request, 'sex.html',context)
+
 from datetime import datetime
 @csrf_exempt
+@login_required
 def get_sex3(request):
+    #render("404.html")
+    #raise Http404
     context = {}
     context['data'] = {}
     context['data']['lineChart'] = []
     context['data']['pieChart'] = []
     return HttpResponse(json.dumps(context), content_type="application/json")
+
 @csrf_exempt
+@login_required
 def get_sex(request):
+    #render("404.html")
     context = {}
     context['data'] = {}
     context['data']['lineChart'] = []
@@ -59,7 +76,8 @@ def get_sex(request):
                 count_day_time['night'] = count_day_time['night'] + 1
         content_repo['value'] = total
         context['data']['lineChart'].append(content_repo)
-
+        #if(total == 0):
+        #    raise Http404
         total = float(count_day_time['day']) + float(count_day_time['night'])
         day_percentage = float(count_day_time['day'])/total
         night_percentage = count_day_time['night']/total
@@ -76,11 +94,16 @@ def get_sex(request):
         content_night['value'] = night_percentage
         context['data']['pieChart'].append(content_day)
         context['data']['pieChart'].append(content_night)
+        #if len(content_day) == 0:
+        #    raise Http404
     return HttpResponse(json.dumps(context), content_type="application/json")
 
 import numpy
 @csrf_exempt
+@login_required
 def get_day_hour(request):
+    #raise Http404
+    #render("404.html")
     context = {}
     context['data'] = []
     USER = request.POST.get('username')
@@ -90,6 +113,7 @@ def get_day_hour(request):
     user = client.get_user(USER)
     repos = user.get_repos()
     dict = numpy.zeros((7, 24))
+    count = 0
     for repo in repos:
         name = repo.name
         new_url = url + name + '/commits'+"?access_token=8e87a4670383b27a163b8a020955b4761a6da3dc"
@@ -101,6 +125,9 @@ def get_day_hour(request):
             day = time.weekday()
             hour = time.hour
             dict[int(day)][int(hour)] = dict[int(day)][int(hour)] + 1
+        count = count + 1
+    #if(count == 0):
+    #    raise Http404
 
     for i in range(7):
         for j in range(24):
@@ -112,17 +139,26 @@ def get_day_hour(request):
     return HttpResponse(json.dumps(context), content_type="application/json")
 
 @csrf_exempt
-def day_hour(request, username):
+@login_required
+def day_hour(request, id):
     context = {}
-    context['username'] = username
+    profile = get_object_or_404(UserProfile, user=id)
+    if not profile.github_login:
+        raise Http404
+
+    context['username'] = profile.github_login
     return render(request, 'day_hour.html',context)
+
 @csrf_exempt
+@login_required
 def language2(request,username):
+    #render("404.html")
     context = {}
     context['username'] = username
     client = Github(ACCESS_TOKEN, per_page=100)
     user = client.get_user(username)
     repos = user.get_repos()
+    total = 0
     for r in repos:
         print r.full_name + " " + r.language
         commits = r.get_commits()
@@ -130,11 +166,16 @@ def language2(request,username):
         for commit in commits:
             count = count + 1
         print count
+        count = count + 1
+    #if(count == 0):
+    #    raise Http404
     return render(request, 'language.html')
 
 
 @csrf_exempt
+@login_required
 def language3(request):
+    #render("404.html")
     USER = request.POST.get('username')
     client = Github(ACCESS_TOKEN, per_page=100)
     user = client.get_user(USER)
@@ -142,6 +183,9 @@ def language3(request):
     context = {}
     context['data'] = []
     candidate_language = {}
+    #if(len(repos) == 0):
+    #    raise Http404
+    #    render("404.html")
     for r in repos:
         languages = r.get_languages()
         for key in languages:
@@ -157,14 +201,24 @@ def language3(request):
         content['freq'] = {}
         for key in candidates:
             content['freq'][key] = 0
+        count = 0 
         for key in languages:
             if key in candidates:
                 content['freq'][key] = languages[key]
+            count = count + 1
+        #if count == 0:
+        #    raise Http404
         context['data'].append(content)
     return HttpResponse(json.dumps(context),content_type="application/json")
 
 @csrf_exempt
-def language(request, username):
+@login_required
+def language(request, id):
+    #render("404.html")
     context = {}
-    context['username'] = username
+    profile = get_object_or_404(UserProfile, user=id)
+    if not profile.github_login:
+        raise Http404
+
+    context['username'] = profile.github_login
     return render(request, 'language.html',context)

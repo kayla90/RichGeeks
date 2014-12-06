@@ -9,6 +9,13 @@
      <div class="container">
         <div class="col-md-10">
             <h1>Apply Project</h1>
+            {% for key, error in form.errors.items %}
+            <div class="alert alert-warning" role="alert">
+                <p style="color: red">
+                    {{ error.as_text|cut:"* " }}
+                </p>
+            </div>
+            {% endfor %}
             <form role="form" action="/project/apply/{{project_id}}" method="POST">
                 <div class="form-group">
                     <label for="experience-des">Description Experience</label>

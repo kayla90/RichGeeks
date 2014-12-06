@@ -8,7 +8,14 @@
 {% block content %}
      <div class="container">
         <div class="col-md-10">
-            <h1>Giving Feedback</h1>
+            <h1>Give Feedback</h1>
+            {% for key, error in form.errors.items %}
+           		<div class="alert alert-warning" role="alert">
+                <p style="color: red">
+                {{ error.as_text|cut:"* " }}
+                </p>
+            	</div>
+            {% endfor %}
             <form role="form" action="/project/evaluation/{{project_id}}" method="POST">
                 <div class="form-group">
                     <label for="evaluation-rating">Rating(from 1 to 5)</label>

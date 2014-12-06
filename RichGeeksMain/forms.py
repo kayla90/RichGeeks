@@ -5,6 +5,7 @@ from models import *
 
 from datetime import date
 from django.contrib.auth import authenticate
+import requests
 
 class RegisterForm(forms.Form):
 	username  = forms.CharField(max_length = 30,
@@ -66,6 +67,14 @@ class RegisterForm(forms.Form):
         # dictionary
 		return email
 
+	def clean_github_token(self):
+		github_token = self.cleaned_data.get('github_token')
+		github_login = get_github_login(github_token)
+		if github_login and len(UserProfile.objects.filter(github_login=github_login)) > 0:
+			raise forms.ValidationError("This Github account has been connected to another Rich Geeks account.")
+
+		return github_token
+
 class SigninForm(forms.Form):
 	username    = forms.CharField(max_length = 30,
 								widget = forms.TextInput(attrs={
@@ -101,7 +110,7 @@ class SendMessageForm(forms.Form):
 	def clean_receiver_userid(self):
 		receiver_userid = self.cleaned_data.get('receiver_userid')
 		if not User.objects.filter(id=receiver_userid):
-			raise form.ValidationError("Receiver does not exist")
+			raise forms.ValidationError("Receiver does not exist")
 		return receiver_userid
 
 
@@ -115,7 +124,7 @@ class ReplyMessageForm(forms.Form):
 	def clean_ancestor_message_id(self):
 		ancestor_message_id = self.cleaned_data.get('ancestor_message_id')
 		if not Message.objects.filter(id=ancestor_message_id):
-			raise form.ValidationError("Ancestor not correct")	
+			raise forms.ValidationError("Ancestor not correct")	
 		return ancestor_message_id
 
 
@@ -129,7 +138,7 @@ class FeedbackProjectForm(forms.Form):
 	def clean_feedback_rating(self):
 		feedback_rating = self.cleaned_data.get('feedback_rating')
 		if not (1 <= feedback_rating <= 5):
-			raise form.ValidationError("feedback rating not correct")	
+			raise forms.ValidationError("feedback rating is not correct, it should be 1 - 5")	
 		return feedback_rating
 
 
@@ -143,7 +152,7 @@ class EvaluationProjectForm(forms.Form):
 	def clean_evaluation_rating(self):
 		evaluation_rating = self.cleaned_data.get('evaluation_rating')
 		if not (1 <= evaluation_rating <=5):
-			raise form.ValidationError("Evaluation rating not correct")
+			raise forms.ValidationError("Evaluation rating is not correct, should be 1 - 5")
 		return evaluation_rating
 
 
@@ -157,6 +166,19 @@ class ApplyProjectForm(forms.Form):
 	def clean(self):
 		cleaned_data = super(ApplyProjectForm, self). clean()
 
+	def clean_expected_earning(self):
+		expected_earning = self.cleaned_data.get('expected_earning')
+		if not (expected_earning >= 0):
+			raise forms.ValidationError("expected earning should not be negative")
+		return expected_earning
+
+	def clean_expected_time(self):
+		expected_time = self.cleaned_data.get('expected_time')
+		if not (0 < expected_time <= 148):
+			raise forms.ValidationError("Expected working time per week is not correct")
+		
+		return expected_time
+
 
 class PostProjectForm(forms.Form):
 	title = forms.CharField(max_length=100)
@@ -169,14 +191,58 @@ class PostProjectForm(forms.Form):
 			choices=LANGUAGE_CHOICES)
 	description_file = forms.FileField(required=False,
 			widget=forms.FileInput)
+	category = forms.ChoiceField(required=False,
+			choices=CATEGORY_CHOICES)
 
 	def clean(self):
 		cleaned_data = super(PostProjectForm, self).clean()
 
+	def clean_title(self):
+		title = self.cleaned_data.get('title')
+		if Project.objects.filter(title=title):
+			raise forms.ValidationError("project title already taken")
+
+		return title
+
+
+	def clean_budget(self):
+		budget = self.cleaned_data.get('budget')
+		if not (budget >= 0):
+			raise forms.ValidationError("project budget cannot be negative")
+
+		return budget
+
+	def clean_workload(self):
+		workload = self.cleaned_data.get('workload')
+		if not (0 < workload):
+			raise forms.ValidationError("Project Working time should be active")
+
+		return workload
+
+
+
+class FilterProjectForm(forms.Form):
+	language = forms.ChoiceField(choices=LANGUAGE_CHOICES, required=False)
+	reward = forms.IntegerField(required=False)
+	category = forms.ChoiceField(choices=CATEGORY_CHOICES, required=False)
+	search_content = forms.CharField(max_length=200, required=False)
+	projects_group = forms.ChoiceField(required = False,
+			choices=(('all', 'all'),('available', 'available')))
+
+	def clean(self):
+		cleaned_data = super(FilterProjectForm, self).clean()
+
+	def clean_reward(self):
+		reward = self.cleaned_data['reward']
+		if reward and (reward < 0 or reward > 6):
+			raise forms.ValidationError("reward selection not legal")
+		return reward
+
+
 class UserProfileForm(forms.ModelForm):
 	class Meta:
 		model   = UserProfile
-		exclude = ['user', 'rand_string','friends']
+		fields = ['full_name', 'profile_image','birthday', 'address', 'country', 'city', 'phone']
 		widgets = {
 			"full_name":forms.TextInput(attrs={'class':'form-control'}),
 			"profile_image":forms.ClearableFileInput(),
@@ -257,9 +323,23 @@ class ForgetPasswordForm(forms.Form):
 		return cleaned_data
 
 class PostNewsFeedForm(forms.Form):
-	news_feed_text = forms.CharField(max_length=1000)
-	image = forms.ImageField(widget=forms.FileInput(), required=False)
+	news_feed_text = forms.CharField(max_length=1000,
+									 widget = forms.Textarea(attrs={
+										'class': 'form-control',
+                                		'placeholder': "What's on your mind?",
+                                		'required': 'true',
+                                		'rows': 2,
+                                		'style': "border-color:#269abc"}))
+	image = forms.ImageField(widget=forms.FileInput(attrs={'style':'display: none;'}),\
+		required=False)
 
 	def clean(self):
-		print("gothere")
 		cleaned_data = super(PostNewsFeedForm, self).clean()
+
+def get_github_login(oauth_token):
+	headers = {'Authorization': 'token ' + oauth_token}
+	r = requests.get('https://api.github.com/user', headers=headers)
+	if 'login' in r.json():
+		return r.json()['login']
+	else:
+		return None

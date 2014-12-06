@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -6,28 +6,58 @@ from django.http import HttpResponseNotFound
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
-
+from django.db.models import Q
 from forms import *
 from models import *
 
 @login_required
 def market(request):
-	projects = Project.objects.filter(status__in=['New','Open'])
-	return render(request, 'market.html', {'projects':projects})
+	form = FilterProjectForm(request.GET)
+	if not form.is_valid():
+		return render(request, 'market.html', {'form':form})
+	
+	projects = Project.objects.all()
+	if form.cleaned_data['language'] and form.cleaned_data['language']!="All":
+		projects = projects.filter(languages__language=form.cleaned_data['language'])
+	
+	if form.cleaned_data['category'] and form.cleaned_data['category']!="All":
+		print(form.cleaned_data['category'])
+		projects = projects.filter(category=form.cleaned_data['category'])
+
+	if form.cleaned_data['reward'] and form.cleaned_data['reward']!=0:
+		reward = form.cleaned_data['reward']
+		if reward==1:
+			projects = projects.filter(budget__lte=100)
+		elif reward==2:
+			projects = projects.filter(budget__gte=100).filter(budget__lte=500)
+		elif reward==3:
+			projects = projects.filter(budget__gte=500).filter(budget__lte=1000)
+		elif reward==4:
+			projects = projects.filter(budget__gte=1000).filter(budget__lte=5000)
+		elif reward==5:
+			projects = projects.filter(budget__gte=5000).filter(budget__lte=10000)
+		elif reward==6:
+			projects = projects.filter(budget__gte=10000)
+
+	if form.cleaned_data['search_content']:
+		search_content = form.cleaned_data['search_content']
+		projects = projects.filter(title__contains=search_content)
+
+	if form.cleaned_data['projects_group']:
+		if form.cleaned_data['projects_group'] == "available":
+			print("available")
+			projects = projects.filter(status__in=['New','Open'])
+
+	return render(request, 'market.html', {'projects':projects, 'filter_form':form})
 
 
 @login_required
 def project_detail(request, project_id):
-	if not Project.objects.filter(id=project_id):
-		return HttpResponseNotFound("Project does not exist")
-
-	project = Project.objects.get(id=project_id)
+	
+	project = get_object_or_404(Project, id=project_id)
 	content = {}
-	print project.owner.user
-	print request.user
 	if (project.owner.user == request.user):
-		print 'here'
-		content['button'] = 'owner'
+		content['owner'] = 'owner'
 
 	content['project'] = project
 
@@ -37,16 +67,13 @@ def project_detail(request, project_id):
 @login_required
 def feedback_project(request, project_id):
 	if request.method != 'POST':
-		return render(request, 'project-feedback.html', {})
+		return render(request, 'project-feedback.html', {'project_id':project_id})
 
-	if not Project.objects.filter(id=project_id):
-		return HttpResponseNotFound("Project does not exist")
+	project = get_object_or_404(Project, id=project_id)
 	
-	project = Project.objects.get(id=project_id)
-
 	form = FeedbackProjectForm(request.POST)
 	if not form.is_valid():
-		return HttpResponseBadRequest("Input content not valid")
+		return render(request, 'project-feedback.html', {'form':form, 'project_id':project_id})
 	
 	new_feedback = ProjectFeedback(
 			feedback_rating=form.cleaned_data['feedback_rating'],
@@ -62,10 +89,7 @@ def evaluate_project(request, project_id):
 	if request.method != 'POST':
 		return render(request, 'project-evaluate.html', {'project_id':project_id})
 
-	if not Project.objects.filter(id=project_id):
-		return HttpResponseNotFound("Project does not exist")
-
-	project = Project.objects.get(id=project_id)
+	project = get_object_or_404(Project, id=project_id)
 
 	if project.owner.user != request.user:
 		return HttpResponseBadRequest("You are not authorized to evaluate this project")
@@ -75,7 +99,7 @@ def evaluate_project(request, project_id):
 
 	form = EvaluationProjectForm(request.POST)
 	if not form.is_valid():
-		return HttpResponseBadRequest("Input content not valid")
+		return render(request, 'project-evaluate.html', {'project_id':project_id, 'form':form})
 
 	project.evaluated = True
 	project.evaluation_score = form.cleaned_data['evaluation_rating']
@@ -94,11 +118,7 @@ def post_project(request):
 
 	form = PostProjectForm(request.POST)
 	if not form.is_valid():
-		for i in form.errors:
-			print i;
-		return HttpResponseBadRequest("Input content not valid")
-		#context['form'] = form
-		#return render(request, 'post-project.html', context)
+		return render(request, 'post-project.html', {'form':form})
 
 	new_project = Project(owner=UserProfile.objects.get(user=request.user),
 			title=form.cleaned_data['title'],
@@ -106,7 +126,8 @@ def post_project(request):
 			budget=form.cleaned_data['budget'],
 			workload=form.cleaned_data['workload'],
 			date_start=form.cleaned_data['date_start'],
-			description_file=form.cleaned_data['description_file'])
+			description_file=form.cleaned_data['description_file'],
+			category=form.cleaned_data['category'])
 	new_project.save()
 
 	for item in form.cleaned_data['languages']:
@@ -126,10 +147,7 @@ def post_project(request):
 @login_required
 def cancel_project(request, project_id):
 	
-	if not Project.objects.filter(id=project_id):
-		return HttpResponseNotFound("Project does not exist")
-
-	project = Project.objects.get(id=project_id)
+	project = get_object_or_404(Project, id=project_id)
 
 	if project.owner.user != request.user:
 		return HttpResponseBadRequest("You are not authorized to cancel this project")
@@ -143,17 +161,14 @@ def cancel_project(request, project_id):
 @login_required
 def apply_project(request, project_id):
 
-	if not Project.objects.filter(id=project_id):
-		return HttpResponseNotFound("Project does not exist")
-
-	project = Project.objects.get(id=project_id)
+	project = get_object_or_404(Project, id=project_id)
 
 	if request.method != 'POST':
 		return render(request, 'project-apply.html', {'project_id':project_id})
 
 	form = ApplyProjectForm(request.POST)
 	if not form.is_valid():
-		return HttpResponseBadRequest("Input content not valid")
+		return render(request, 'project-apply.html', {'project_id':project_id, 'form':form})
 
 	application = ProjectApplication(
 			user_profile=UserProfile.objects.get(user=request.user),
@@ -185,10 +200,7 @@ def apply_project(request, project_id):
 @login_required
 def assign_project(request, project_id, user_id):
 
-	if not Project.objects.filter(id=project_id):
-		return HttpResponseNotFound("Project does not exist")
-
-	project = Project.objects.get(id=project_id)
+	project = get_object_or_404(Project, id=project_id)
 
 	if project.owner.user != request.user:
 		return HttpResponseBadRequest("You are not authorized to assign this project")
@@ -237,10 +249,7 @@ def assign_project(request, project_id, user_id):
 @login_required
 def finish_project(request, project_id):
 
-	if not Project.objects.filter(id=project_id):
-		return HttpResponseNotFound("Project does not exist")
-
-	project = Project.objects.get(id=project_id)
+	project = get_object_or_404(Project, id=project_id)
 
 	if project.owner.user != request.user:
 		return HttpResponseBadRequest("You are not authorized to assign this project")

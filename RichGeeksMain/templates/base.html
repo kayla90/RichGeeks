@@ -14,7 +14,7 @@
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="static/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href='http://fonts.googleapis.com/css?family=Lobster+Two' rel='stylesheet' type='text/css'>
     <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
     <link href='http://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
@@ -63,6 +63,7 @@
                         <span class="glyphicon glyphicon-envelope">
                         </span>
                         Message
+                        <span class="badge" id="message-number"></span>
                       </a>
                     </li>
                     <li class="me-nav-btn">
@@ -83,9 +84,9 @@
 
                   <ul class="nav navbar-nav navbar-right">
                     <li>
-                      <form class="navbar-form navbar-right search" role="search">
+                      <form class="navbar-form navbar-right search" role="search" action="/market">
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Find project" size="8">
+                            <input type="text" class="form-control" name="search_content" placeholder="Find project">
                         </div>
                         <button type="submit" class="btn btn-default btn-circle">
                             <span class="glyphicon glyphicon-search"></span>
@@ -121,6 +122,7 @@
         <!-- </div> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/new_message.js"></script>
     {% block js %}{% endblock %}
 </body>
 </html>

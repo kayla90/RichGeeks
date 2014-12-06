@@ -26,6 +26,7 @@ $.ajaxSetup({
     }
 });
 
+
 $(function() {
 
     $('#side-menu').metisMenu();
@@ -55,8 +56,36 @@ $(function() {
     })
 });
 
+function skill(){
+  var box = '<select id="thedropdown"><option value ="JavaScript">JavaScript</option><option value ="Ruby">Ruby</option><option value="Java">Java</option><option value="PHP">PHP</option><option value="Python">Python</option><option value="C++">C++</option><option value="C">C</option><option value="Objective-C">Objective-C</option><option value="C#">C#</option><option value="Shell">Shell</option><option value="CSS">CSS</option><option value="Perl">Perl</option></select>';
+       bootbox.dialog({
+                title: "Select your favourite language",
+                message: box,
+                buttons: {
+                    success: {
+                        label: "Save",
+                        className: "btn-success",
+                        callback: function () {
+                            var answer = $('#thedropdown').val();
+                            console.log(answer);
+                             $.ajax({
+                        url: "/set_language",
+                        type: "POST",
+                        data : { 'username' : '{{username}}', 'language' : answer},
+                        success: function (json) {
+                            bootbox.alert("success.");     
+                        },
+                        error: function (xhr, errmsg, err) {
+                            console.log('error');
+                        }
+                    });    
+                        }
+                    }
+                }
+            });
+}
+
 $(document).ready( function() {
-    $(".me-nav-btn").addClass("active");
 
     // // after a click action on the .list-group-item
     // $('#side-menu li').on('click',function(e){
@@ -73,16 +102,38 @@ $(document).ready( function() {
     //         $("#profile-right-bottom").html(data);
     //     });
     // });
+    
 
     $('#side-menu li a.first').on('click',function(e){
-        console.log(1);
-        // $.get( "/profile-analysis/"+$(".profile-main").attr("user"), function( data ) {
         $.get( "/profile-analysis/"+$(".profile-main").attr("user"), function( data ) {
-            $("#page-wrapper .row").html(data);
-            $.post( "/language/kayla90", function( data2 ) {
+            $("#page-wrapper .row .col-lg-12").html(data);
+            $.post( "/language/"+$(".profile-main").attr("user"), function( data2 ) {
                 $(".tab-content").html(data2);  
             }); 
         });
+        return false;
+    });
+
+    $('#side-menu li a.second').on('click',function(e){
+        $.get( "/profile-analysis/"+$(".profile-main").attr("user"), function( data ) {
+            $("#page-wrapper .row .col-lg-12").html(data);
+            $("#analysis-title").html("Code Style");
+            $.post( "/sex/"+$(".profile-main").attr("user"), function( data2 ) {
+                $(".tab-content").html(data2);  
+            }); 
+        });
+        return false;
+    });
+
+    $('#side-menu li a.third').on('click',function(e){
+        $.get( "/profile-analysis/"+$(".profile-main").attr("user"), function( data ) {
+            $("#page-wrapper .row .col-lg-12").html(data);
+            $("#analysis-title").html("Day & Hour");
+            $.post( "/day_hour/"+$(".profile-main").attr("user"), function( data2 ) {
+                $(".tab-content").html(data2);  
+            }); 
+        });
+        return false;
     });
 
     // $('#function-menu li.project').on('click',function(e){
@@ -102,4 +153,11 @@ $(document).ready( function() {
     //     };
         
     // });
+
+    $('button.github').on("click", function(event) {
+        var host = window.location.hostname;
+        var port = window.location.port;
+        window.location.replace('https://github.com/login/oauth/authorize?client_id=9cb96333069fb96e1196&redirect_uri=http://'
+         + host + ':' + port + '/profile/' + $(".profile-main").attr("user"));
+    });
 });

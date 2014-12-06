@@ -16,7 +16,7 @@
 		<div style="margin-left:120px;">
 			<nav class="say">
 			 <a href="#NewGrumbl" role="tab" data-toggle="tab" class="active">Say something</a>
-			 <a href="#NewPhoto" role="tab" data-toggle="tab" >Post a picture</a>
+			 <a href="#NewPhoto" role="tab" data-toggle="tab" id="post-picture">Post a picture</a>
 			 <a href="/project/post">Post project</a>
 			</nav>
   	        <div class="tab-content" style="margin-top:10px">
@@ -24,24 +24,11 @@
   	            <form enctype="multipart/form-data" role="form" action="/news_feed/post" method="post">
   	              <div class="row">
   	                <div class="col-xs-10">
-  	                  <textarea class="form-control" rows="2" name="news_feed_text" id="grumblContent" placeholder="What's on your mind?" style="border-color:#269abc" required></textarea>
+  	                  {{ post_form.news_feed_text }}
+  	                  {{ post_form.image }}
   	                </div>
   	                <div class="col-xs-2" style="margin-left:-20px; margin-top:20px">
   	                  <button type="submit" class="btn btn-primary">Post</button>
-  	                </div>
-  	              </div>
-  	              {% csrf_token %}
-  	            </form>
-  	          </div>
-  	          <div class="tab-pane" id="NewPhoto">
-  	            <form enctype="multipart/form-data" role="form" action="/news_feed/post" method="post">
-  	              <div class="row">
-  	                <div class="col-xs-10">
-  	                  <textarea class="form-control" rows="2" name="news_feed_text" id="grumblContent" placeholder="What's on your mind?" style="border-color:#269abc" required></textarea>
-  	                </div>
-  	                <div class="col-xs-2" style="margin-left:-20px">
-  	                  <input name="image" type="file">
-  	                  <button type="submit" class="btn btn-primary btn-sm" style="margin-top:3px">Post</button>
   	                </div>
   	              </div>
   	              {% csrf_token %}
@@ -53,6 +40,7 @@
 
 	<div class="status-content">
 		<ul class="media-list">
+		{% if news_feeds %}
 		{% for news_feed in news_feeds %}
 			{% if news_feed.news_type == "New Project" %}
 				{% include 'news_feed/news_new_project.html' with news_feed=news_feed %}
@@ -73,6 +61,9 @@
 				{% include 'news_feed/news_finish_project.html' with news_feed=news_feed %}
 			{% endif %}
 		{% endfor %}
+		{% else %}
+		<h4>You don't have anything on your Geeks's Bridge. <a href="{% url 'match' %}">Find some friends!</h4>
+		{% endif %}
 		</ul>
 
 	</div>
@@ -85,45 +76,64 @@
 	<div class="panel panel-default ongoing-projects">
 		<div class="panel-heading">
 			<h3 class="panel-title">
-				<span class="badge">5</span>
+				<span class="badge">{{ ongoing|length }}</span>
 				Ongoing projects you joined
 			</h3>
 		</div>
 		<div class="list-group">
-			<a href="#" class="list-group-item">
-				Rich Geeks
-			</a>
-			<a href="#" class="list-group-item">
-				Map-Reduce Facility
-			</a>
+			{% if ongoing %}
+			{% for p in ongoing %}
+				<a href="{% url 'project' p.id %}" class="list-group-item">
+					{{ p.title }}
+				</a>
+			{% endfor %}
+			{% else %}
+				<li class="list-group-item">
+					You haven't joined a project yet. <a href="{% url 'match' %}">Match a project!</a>
+				</li>
+			{% endif %}
 		</div>
 	</div>
 	<div class="panel panel-default finished-projects">
 		<div class="panel-heading">
 			<h3 class="panel-title">
-				<span class="badge">5</span>
+				<span class="badge">{{ finished|length }}</span>
 				Finished projects you contributed to
 			</h3>
 		</div>
 		<div class="list-group">
-			<a href="#" class="list-group-item">
-				Rich Geeks
-			</a>
-			<a href="#" class="list-group-item">
-				Map-Reduce Facility
-			</a>
+			{% if finished %}
+			{% for p in finished %}
+				<a href="{% url 'project' p.id %}" class="list-group-item">
+					{{ p.title }}
+				</a>
+			{% endfor %}
+			{% else %}
+				<li class="list-group-item">
+					You haven't finished a project yet. Work hard!
+				</li>
+			{% endif %}
 		</div>
 	</div>
 	<div class="panel panel-default owned-projects">
 		<div class="panel-heading">
 			<h3 class="panel-title">
-				<span class="badge">5</span>
+				<span class="badge">{{ owned|length }}</span>
 				Owned projects
 			</h3>
 		</div>
 		<div id="grid" class="list-group grid clearfix">
-			<li class="list-group-item grid__item">Rich Geeks</li>
-			<li class="list-group-item grid__item">Map-Reduce Facility</li>
+			{% if owned %}
+			{% for p in owned %}
+				<a href="{% url 'project' p.id %}" class="list-group-item">
+					{{ p.title }}
+				</a>
+			{% endfor %}
+			{% else %}
+				<li class="list-group-item">
+					You don't owned a project yet. <a href="{% url 'post_project' %}">Post one!</a>
+				</li>
+			{% endif %}
 		</div>
 	</div>
 </div>

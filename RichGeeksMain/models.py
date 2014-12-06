@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 LANGUAGE_CHOICES = (
+	('All', 'All'),
 	('JavaScript', 'JavaScript'),
 	('Ruby', 'Ruby'),
 	('Java', 'Java'),
@@ -14,6 +15,18 @@ LANGUAGE_CHOICES = (
 	('Shell', 'Shell'),
 	('CSS', 'CSS'),
 	('Perl', 'Perl'),
+	)
+
+CATEGORY_CHOICES = (
+	("All", "All"),
+	('Web Programming', 'Web Programming'),
+	('Data Analysis', 'Data Analysis'),
+	('Database Development', 'Database Development'),
+	('Mobile Application', 'Mobile Application'),
+	('Software Application', 'Software Application'),
+	('System Administration', 'System Administration'),
+	('Testing QA', 'Testing QA'),
+	('Website Design', 'Website Design'),
 	)
 
 class UserProfile(models.Model):
@@ -31,7 +44,7 @@ class UserProfile(models.Model):
 	
 	full_name = models.CharField(max_length=100, null=True, blank=True)
 	#User's list of friend, pointing to another "UserInfo" instance
-	friends = models.ManyToManyField('self')
+	friends = models.ManyToManyField('self', through='Friend', symmetrical=False)
 
 	#Basic Information: sex and birthday
 	gender = models.CharField(max_length=6, choices=(('Male', 'Male'), ('F', 'Female')),blank=True)
@@ -48,7 +61,13 @@ class UserProfile(models.Model):
 	github_login = models.CharField(max_length=100, null=True, blank=True)
 
 	def __unicode__(self):
-		return u'user\'s profile: %s %s' % (self.user.first_name, self.user.last_name)
+		return u'user\'s profile: %s' % (self.user.username)
+
+
+class Friend(models.Model):
+	accepted = models.BooleanField(default=False)
+	source = models.ForeignKey(UserProfile, related_name="friend_source")
+	target = models.ForeignKey(UserProfile, related_name="friend_target")
 
 
 #This is a model indicating a certain programming language and its length
@@ -167,7 +186,9 @@ class Project(models.Model):
 	
 	#a list of feedback from other users, like comments
 	feedback = models.ManyToManyField('ProjectFeedback')
-
+	
+	category = models.CharField(max_length=30, default="", choices=CATEGORY_CHOICES)
+	
 
 class ProjectFeedback(models.Model):
 	feedback_rating = models.IntegerField(blank=True, null=True, choices=(

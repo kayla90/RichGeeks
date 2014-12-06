@@ -10,5 +10,6 @@
                 </p>
                 <p>{{project.description}}</p>
                 <p><b>Languages: </b>{% for language in project.languages.all %}{{language.language}}, {% endfor %}<br>
+                <b>Category: </b>{{project.category}}<br>
                 <b>Reward: </b>{{project.budget}}</p>
             </div>

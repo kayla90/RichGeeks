@@ -217,3 +217,9 @@ border-radius: 500px;*/
 	white-space: nowrap;
 	vertical-align: middle;
 }
+
+.project {
+	background-color: #eee;
+	padding: 15px;
+	margin-bottom: 15px;
+}

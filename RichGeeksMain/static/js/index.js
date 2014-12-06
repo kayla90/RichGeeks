@@ -26,6 +26,8 @@ $('.navbar-collapse ul li a').click(function() {
 });
 
 $('button.github').on("click", function(event) {
-	window.location.replace('https://github.com/login/oauth/authorize?client_id=9cb96333069fb96e1196');
-	console.log(1);
+    var host = window.location.hostname;
+    var port = window.location.port;
+	window.location.replace('https://github.com/login/oauth/authorize?client_id=9cb96333069fb96e1196&redirect_uri=http://'
+        + host + ':' + port + '/register');
 });

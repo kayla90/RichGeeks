@@ -918,3 +918,7 @@ body {
 .modal-body .signup-form input[type="name"] {
   margin-top: 0px;
 }
+
+section#team {
+    padding-bottom: 50px;
+}

@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Rich Geeks - {{project.title}}</title>
+    <title>Rich Geeks - {{user.username}}</title>
 
     <!-- Bootstrap Core CSS -->
    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
@@ -74,6 +74,7 @@
                         <span class="glyphicon glyphicon-envelope">
                         </span>
                         Message
+                        <span class="badge" id="message-number" style="background:#ddd"></span>
                       </a>
                     </li>
                     <li class="me-nav-btn">
@@ -83,13 +84,20 @@
                         Me
                       </a>
                     </li>
+                    <li class="match-nav-btn">
+                      <a href="/match">
+                        <span class="glyphicon glyphicon-magnet">
+                        </span>
+                        Match
+                      </a>
+                    </li>
                   </ul>
 
                   <ul class="nav navbar-nav navbar-right">
                     <li>
-                      <form class="navbar-form navbar-right search" role="search">
+                      <form class="navbar-form navbar-right search" role="search" action="/market">
                         <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Find projects">
+                            <input type="text" class="form-control" name="search_content" placeholder="Find project">
                         </div>
                         <button type="submit" class="btn btn-default btn-circle">
                             <span class="glyphicon glyphicon-search"></span>
@@ -132,7 +140,7 @@
                             <img src="{% url 'avatar' user.id %}" alt="avatar" class="img-circle">
                         </div>
                         <h1>Change your name?</h1>
-                        <input type="text" id="project-title" name="title">
+                        <input type="text" id="change-name" name="title">
                         <hr class="small">
                         <!-- <span class="subheading">A Clean Blog Theme by Start Bootstrap</span> -->
                     </div>
@@ -150,25 +158,23 @@
                 <li>
                     <a class="active" href="#"><i class="fa fa-dashboard fa-fw"></i> Basic Info</a>
                 </li>
+                
                 <li>
                     <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Analysis<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level collapse" aria-expanded="false" style="height: 0px;">
                         <li>
-                            <a href="#">First Table</a>
+                            <a href="#" class="first">Languages</a>
                         </li>
                         <li>
-                            <a href="#">Second Table</a>
+                            <a href="#" class="second">Code Style</a>
+                        </li>
+                        <li>
+                            <a href="#" class="third">Day & Hour</a>
                         </li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-table fa-fw"></i> Skills</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-table fa-fw"></i> History Project</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-table fa-fw"></i> Resume</a>
+                    <a href="#" class="skills" onclick="skill()"><i class="fa fa-table fa-fw"></i> Skills</a>
                 </li>
             </ul>
         </div>
@@ -176,13 +182,10 @@
             <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header">Basic Info</h1>
-                    <form enctype="multipart/form-data" method="post" action={% url 'edit' %}>
+                    <form enctype="multipart/form-data" id="profile_form" method="post" action={% url 'edit' %}>
                     <table class= "table table-striped">
                         <tbody>
-                            <tr>
-                                <td>Full Name: </td>
-                                <td>{{ userprofileform.full_name }}</td>
-                            </tr>
+                            <input type="hidden" id="fullname" name="full_name" value="">
                             <tr>
                                 <td>Profile Image: </td>
                                 <td>
@@ -316,6 +319,8 @@
     <!-- Contact Form JavaScript -->
     <script src="/static/js/jqBootstrapValidation.js"></script>
     <script src="/static/js/profile.js"></script>
+    <script src="/static/js/new_message.js"></script>
+    <script src="/static/js/edit_profile.js"></script>
 
 </body>
 

@@ -2,52 +2,121 @@
 {% block title %}Rich Geeks{% endblock %}
 
 {% block css %}
-
+<link href="/static/css/market.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="bootbox.min.js"></script>
+<script>
+
+function project_language(){
+    $.get( "/get_project_language", function( data ) {
+    		$("#market-content").html("<div class=\"jumbotron\"><h1>Project Languages</h1></div>");
+            $("#market-content").append(data);
+            $.post( "/project_language", function( data2 ) {
+                console.log("data2" + data2);
+                $("#market-content").append(data2);
+                $("#project-language-graph").addClass("disabled active")
+            }); 
+            $("#market-content").append($("svg"));
+        });
+}
+</script>
       <div class="container">
         <div class="col-md-3" id="statuses">
+            <form action="/market">
+            
+            	<div class="list-group">
+                    <a href="#" class="list-group-item active">Projects</a>
+                </div>
+                
+                <div class="input-group">
+                	<span class="input-group-btn">
+                		<button type="submit" class="btn btn-default">Search</button>
+                	</span>
+                	<input type="text" class="form-control" name="search_content">
+               	</div>
+                <div class="list-group"></div>
+            
+            	<div class="list-group">
+                	<a href="?projects_group=all" class="list-group-item {% if filter_form.projects_group.value == "all" %}active{% endif %}">All Projects</a>
+                	<a href="?projects_group=available" class="list-group-item {% if filter_form.projects_group.value == "available" %}active{% endif %}">Available Projects</a>
+        		</div>
+        		<input type="hidden" name="projects_group" value="{% if filter_form.projects_group.value == "available" %}available{% else %}all{% endif %}">
+        		
+                <div class="list-group">
+                    <select class="list-group-item" name="category">
+                        <option value="All">All Categories</option>
+                        <option value="Data Analysis" {% if filter_form.category.value == "Data Analysis" %}selected="selected"{% endif %}>Data Analysis</option>
+                        <option value="Database Development" {% if filter_form.category.value == "Database Development" %}selected="selected"{% endif %}>Database Development</option>
+                        <option value="Mobile Application" {% if filter_form.category.value == "Mobile Application" %}selected="selected"{% endif %}>Mobile Application</option>
+                        <option value="Software Application" {% if filter_form.category.value == "Software Application" %}selected="selected"{% endif %}>Software Application</option>
+                        <option value="System Administration" {% if filter_form.category.value == "System Administration" %}selected="selected"{% endif %}>System Administration</option>
+                        <option value="Testing QA" {% if filter_form.category.value == "Testing QA" %}selected="selected"{% endif %}>Testing QA</option>
+                        <option value="Website Design" {% if filter_form.category.value == "Website Design" %}selected="selected"{% endif %}>Website Design</option>
+                    </select>
+                </div>
+                
+                <div class="list-group">
+                    <select class="list-group-item" name="reward">
+                        <option value="0">All Rewards</option>
+                        <option value="1" {% if filter_form.reward.value == "1" %}selected="selected"{% endif %}>&lt;100</option>
+                        <option value="2" {% if filter_form.reward.value == "2" %}selected="selected"{% endif %}>100 - 500</option>
+                        <option value="3" {% if filter_form.reward.value == "3" %}selected="selected"{% endif %}>500 - 1000</option>
+                        <option value="4" {% if filter_form.reward.value == "4" %}selected="selected"{% endif %}>1000 - 5000</option>
+                        <option value="5" {% if filter_form.reward.value == "5" %}selected="selected"{% endif %}>5000 - 10000</option>
+                        <option value="6" {% if filter_form.reward.value == "6" %}selected="selected"{% endif %}>&gt;10000</option>
+                    </select>
+                </div>
+                <div class="list-group">
+                    <select class="list-group-item" name="language">
+                        <option value="All" selected="selected">All Languages</option>
+                        <option value="JavaScript" {% if filter_form.language.value == "JavaScript" %}selected="selected"{% endif %}>JavaScript</option>
+                        <option value="Ruby" {% if filter_form.language.value == "Ruby" %}selected="selected"{% endif %}>Ruby</option>
+                        <option value="Java" {% if filter_form.language.value == "Java" %}selected="selected"{% endif %}>Java</option>
+                        <option value="PHP" {% if filter_form.language.value == "PHP" %}selected="selected"{% endif %}>PHP</option>
+                        <option value="Python" {% if filter_form.language.value == "Python" %}selected="selected"{% endif %}>Python</option>
+                        <option value="C++" {% if filter_form.language.value == "C++" %}selected="selected"{% endif %}>C++</option>
+                        <option value="C" {% if filter_form.language.value == "C" %}selected="selected"{% endif %}>C</option>
+                        <option value="Objective-C" {% if filter_form.language.value == "Objective-C" %}selected="selected"{% endif %}>Objective-C</option>
+                        <option value="C#" {% if filter_form.language.value == "C#" %}selected="selected"{% endif %}>C#</option>
+                        <option value="Shell" {% if filter_form.language.value == "Shell" %}selected="selected"{% endif %}>Shell</option>
+                        <option value="CSS" {% if filter_form.language.value == "CSS" %}selected="selected"{% endif %}>CSS</option>
+                        <option value="Perl" {% if filter_form.language.value == "Perl" %}selected="selected"{% endif %}>Perl</option>
+                    </select>
+                </div>
+                
+            </form>
             <div class="list-group">
-                <a href="#" class="list-group-item">Projects</a>
-                <a href="#" class="list-group-item">Geeks</a>
-                <a href="#" class="list-group-item">Posts</a>
-            </div>
-            <div class="list-group">
-                <a href="#" class="list-group-item">All Categories</a>
-                <a href="#" class="list-group-item">Web Application</a>
-                <a href="#" class="list-group-item">Mobile Application</a>
-                <a href="#" class="list-group-item">Design</a>
-            </div>
-            <div class="list-group">
-                <a href="#" class="list-group-item">All Rewards</a>
-                <a href="#" class="list-group-item">&lt500</a>
-                <a href="#" class="list-group-item">500 - 1000</a>
-            </div>
-            <div class="list-group">
-                <a href="#" class="list-group-item">All Ratings</a>
-                <a href="#" class="list-group-item">
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                </a>
-                <a href="#" class="list-group-item">
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                </a>
-            </div>
+                <p class="list-group-item">Statsictis</p>
+                <a id="project-language-graph" class="list-group-item" onclick="project_language()">Project Languages</a>
+        	</div>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-8" id="market-content">
+            {% for key, error in form.errors.items %}
+            <div class="alert alert-warning" role="alert">
+                <p style="color: red">
+                    {{ error.as_text|cut:"* " }}
+                </p>
+            </div>
+            {% endfor %}
             <div class="jumbotron">
                 <h1>{{projects|length}} Results</h1>
             </div>
             {% for project in projects %}
-  	          {% include 'project-overview.html' with project=project %}
-  	        {% endfor %}            
+              {% include 'project-overview.html' with project=project %}
+            {% endfor %}            
         </div>
       </div>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+$(".market-nav-btn").addClass("active");
+</script>
 {% endblock %}

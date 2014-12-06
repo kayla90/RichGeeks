@@ -251,7 +251,7 @@ hr.small {
 .intro-header .site-heading .subheading,
 .intro-header .page-heading .subheading {
   font-size: 24px;
-  line-height: 1.1,
+  line-height: 1.1;
 			display: block;
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: 300;
@@ -282,4 +282,28 @@ footer .copyright {
   font-size: 14px;
   text-align: center;
   margin-bottom: 0;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+.btn-default:hover,
+.btn-default:focus {
+  background-color: #fed136;
+  border: 1px solid #fed136;
+  color: white;
+}
+
+.search input {
+  border-radius: 25px;
+}
+
+.intro-header {
+  margin-bottom: 0px;
 }

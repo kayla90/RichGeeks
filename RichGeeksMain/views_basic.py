@@ -4,9 +4,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
 from django.utils import timezone
 from django.template.loader import render_to_string
-from github import Github
+from django.contrib import messages
 # Needed to manually create HttpResponses or raise an Http404 exception
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 
 # Decorator to use built-in authentication system
 from django.contrib.auth.decorators import login_required
@@ -32,20 +32,22 @@ from RichGeeksMain.forms import *
 
 import json
 import requests
+from github import Github
 
+# Some fields related with GitHub API
 GITHUB_PARAM = {'client_id': '9cb96333069fb96e1196',
 	'client_secret': '425a2b4cf5f0b142a342db25fa642bf32b04c1b8'}
 
 def index(request):
 	if request.user.is_authenticated():
 		return redirect(reverse('home'))
-
 	registerform = RegisterForm()
 	signinform = SigninForm()
 	return render(request, 'index.html', {
 		'registerform': registerform,
 		'signinform'  : signinform})
 
+# Utility to get the github token
 def get_github_token(code):
 	params = GITHUB_PARAM
 	params['code'] = code
@@ -57,6 +59,7 @@ def get_github_token(code):
 	else:
 		return None
 
+# Utility to get the github login
 def get_github_login(oauth_token):
 	headers = {'Authorization': 'token ' + oauth_token}
 	r = requests.get('https://api.github.com/user', headers=headers)
@@ -122,7 +125,8 @@ def register(request):
 	new_profile = UserProfile(user=new_user)
 	language = 'Python'
 	if 'github_token' in request.POST and request.POST['github_token']:
-		github_login = get_github_login(request.POST['github_token'])
+		github_login = get_github_login(request.POST['github_token']) 
+
 		new_profile.github_login = github_login
 		USER = github_login
 		ACCESS_TOKEN = '8e87a4670383b27a163b8a020955b4761a6da3dc'
@@ -227,10 +231,32 @@ def profile(request, userid):
 	context['profile_user'] = profile_user
 	context['profile'] = profile
 
+
+	if 'code' in request.GET and userid == str(request.user.id)\
+		and (not profile.github_login):
+		oauth_token = get_github_token(request.GET['code'])
+		if oauth_token:
+			github_login = get_github_login(oauth_token)
+			if len(UserProfile.objects.filter(github_login=github_login)) == 0:
+				profile.github_login = github_login
+				profile.save()
+				messages.add_message(request, messages.INFO,
+						 'Successfully connects the github account')
+			else:
+				messages.add_message(request, messages.INFO,
+						 'This Github account has already been connected to another Rich Geeks account')
+
 	# check if are friends
+	my_profile = UserProfile.objects.get(user=request.user);
 	if request.user.id != userid:
-		if User.objects.get(id = userid) in profile.friends.all():
-			context['friend'] = True
+		print(my_profile.friends.all())
+		if Friend.objects.filter(source=my_profile, target=profile):
+			context['friend'] = Friend.objects.get(source=my_profile, target=profile)
+
+	if (profile.full_name != None):
+		context['show_full_name'] = True;
+	else:
+		context['show_full_name'] = False;
 	
 	return render(request, "profile.html", context)
 
@@ -248,7 +274,6 @@ def profile_analysis(request, userid):
 @login_required
 def edit(request):
 	context = {}
-
 	userprofileform = UserProfileForm(
 			instance=UserProfile.objects.get(user=request.user))
 	context['passwordform'] = PasswordForm(request.user)
@@ -336,3 +361,52 @@ def reset_password(request, id, token):
 	user.save()
 
 	return redirect(reverse('login'))
+
+
+def add_friend(request, userid):
+
+	profile = get_object_or_404(UserProfile, user__id = userid)
+
+	# check if are friends
+	my_profile = UserProfile.objects.get(user=request.user)
+	if request.user.id != userid and my_profile != profile:
+		if not Friend.objects.filter(source=my_profile, target=profile):
+			f = Friend(source=my_profile, target=profile)
+			f.save()
+			message = Message(message_type="Friend Request",
+			sender=my_profile,
+			receiver=profile)
+			message.save()
+
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'));
+
+
+def remove_friend(request, userid):
+
+	profile = get_object_or_404(UserProfile, user__id = userid)
+
+	# check if are friends
+	my_profile = UserProfile.objects.get(user=request.user)
+	if request.user.id != userid:
+		if Friend.objects.filter(source=my_profile, target=profile):
+			f = Friend.objects.get(source=my_profile, target=profile)
+			f.delete()
+		
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER')); 
+
+
+def accept_friend(request, userid):
+	
+	profile = get_object_or_404(UserProfile, user__id = userid)
+
+	# check if are friends
+	my_profile = UserProfile.objects.get(user=request.user)
+	if Friend.objects.filter(source=profile, target=my_profile):
+		f = Friend.objects.get(source=profile, target=my_profile)
+		f.accepted = True
+		f.save()
+
+	message = Message.objects.get(sender=profile, receiver=my_profile, message_type="Friend Request")
+	message.delete()
+	
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER')); 
